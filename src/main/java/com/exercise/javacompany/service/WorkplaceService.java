@@ -1,11 +1,12 @@
 package com.exercise.javacompany.service;
 
-import com.exercise.javacompany.DTO.WorkplaceCreateOrUpdateDTO;
-import com.exercise.javacompany.DTO.WorkplaceDTO;
+import com.exercise.javacompany.DTO.WorkplaceDTOs.WorkplaceCreateOrUpdateDTO;
+import com.exercise.javacompany.DTO.WorkplaceDTOs.WorkplaceDTO;
 import com.exercise.javacompany.model.Employee;
 import com.exercise.javacompany.model.Workplace;
 import com.exercise.javacompany.repository.EmployeeRepository;
 import com.exercise.javacompany.repository.WorkplaceRepository;
+import com.exercise.javacompany.utils.ValidationUtils;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.jetbrains.annotations.NotNull;
@@ -87,7 +88,7 @@ public class WorkplaceService {
                                 "Employee not found with ID: " + workplaceCreateOrUpdateDTO.getEmployeeId()
                         ));
 
-        if(checkFieldIsUpdatedAndValid(workplace.getDescription(), workplaceCreateOrUpdateDTO.getDescription())) {
+        if(ValidationUtils.checkFieldIsUpdatedAndValid(workplace.getDescription(), workplaceCreateOrUpdateDTO.getDescription())) {
             workplace.setDescription(workplaceCreateOrUpdateDTO.getDescription());
         }
 
@@ -134,19 +135,11 @@ public class WorkplaceService {
     }
 
     private void setPrevEmployeeWorkplaceToNullIfNecessary(Employee employee) {
-        Optional<Workplace> employeesWorkplace = workplaceRepository.findByEmployee(employee);
-        employeesWorkplace.ifPresent(workplace -> {
+
+        workplaceRepository.findByEmployee(employee).ifPresent(workplace -> {
             workplace.setEmployee(null);
             workplaceRepository.save(workplace);
         });
-    }
-
-    //TODO SR: Lager es eventuell ins utils
-    private boolean checkFieldIsUpdatedAndValid(String oldValue, String newValue) {
-        return (newValue != null
-                && !newValue.isEmpty()
-                && !Objects.equals(oldValue,newValue)
-        );
     }
 
 }

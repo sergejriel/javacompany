@@ -1,6 +1,6 @@
 package com.exercise.javacompany.controller;
 
-import com.exercise.javacompany.DTO.EmployeeCreateDTO;
+import com.exercise.javacompany.DTO.EmployeeDTOs.EmployeeCreateDTO;
 import com.exercise.javacompany.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;

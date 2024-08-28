@@ -1,6 +1,6 @@
 package com.exercise.javacompany.service;
 
-import com.exercise.javacompany.DTO.EmployeeCreateDTO;
+import com.exercise.javacompany.DTO.EmployeeDTOs.EmployeeCreateDTO;
 import com.exercise.javacompany.model.Employee;
 import com.exercise.javacompany.repository.EmployeeRepository;
 import com.exercise.javacompany.repository.WorkplaceRepository;

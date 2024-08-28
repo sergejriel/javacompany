@@ -1,4 +1,4 @@
-package com.exercise.javacompany.DTO;
+package com.exercise.javacompany.DTO.WorkplaceDTOs;
 
 import com.exercise.javacompany.model.Employee;
 import com.exercise.javacompany.model.Workplace;

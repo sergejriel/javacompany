@@ -1,7 +1,7 @@
 package com.exercise.javacompany.controller;
 
-import com.exercise.javacompany.DTO.WorkplaceCreateOrUpdateDTO;
-import com.exercise.javacompany.DTO.WorkplaceDTO;
+import com.exercise.javacompany.DTO.WorkplaceDTOs.WorkplaceCreateOrUpdateDTO;
+import com.exercise.javacompany.DTO.WorkplaceDTOs.WorkplaceDTO;
 import com.exercise.javacompany.service.WorkplaceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

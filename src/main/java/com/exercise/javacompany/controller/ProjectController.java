@@ -1,6 +1,6 @@
 package com.exercise.javacompany.controller;
 
-import com.exercise.javacompany.model.Project;
+import com.exercise.javacompany.DTO.ProjectDTOs.ProjectDTO;
 import com.exercise.javacompany.service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,7 +29,7 @@ public class ProjectController {
 
 
     @GetMapping("/projects")
-    public List<Project> getProjects() {
+    public List<ProjectDTO> getProjects() {
         return projectService.getProjects();
     }
 
