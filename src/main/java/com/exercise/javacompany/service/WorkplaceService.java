@@ -38,7 +38,7 @@ public class WorkplaceService {
         if(workplace.isPresent()) {
             return new WorkplaceDTO(workplace.get());
         } else {
-            throw new IllegalStateException("workplace with id " + workplaceID + " foes not exists");
+            throw new IllegalStateException("workplace with id " + workplaceID + " does not exists");
         }
     }
 
@@ -60,7 +60,7 @@ public class WorkplaceService {
                     () -> new IllegalArgumentException("Employee not found with ID: " + workplaceCreateOrUpdateDTO.getEmployeeId())
             );
 
-            setPrevEmployeeWorkplaceToNullIfNecessary(employee);
+            removeEmployeeFromAnyWorkplace(employee);
         }
 
         Workplace workplace = new Workplace(
@@ -113,7 +113,7 @@ public class WorkplaceService {
                                 workplace.getEmployee(),
                                 employee
                 )) {
-                    setPrevEmployeeWorkplaceToNullIfNecessary(employee);
+                    removeEmployeeFromAnyWorkplace(employee);
                     workplace.setEmployee(employee);
                 }
             } catch (EntityNotFoundException e) {
@@ -126,6 +126,17 @@ public class WorkplaceService {
         return new WorkplaceDTO(workplace);
     }
 
+    public void addEmployeeToWorkplace(Employee employee, Long workplaceId) {
+        removeEmployeeFromAnyWorkplace(employee);
+
+        Workplace workplace = workplaceRepository.findById(workplaceId).orElseThrow();
+        workplace.setEmployee(employee);
+        workplaceRepository.save(workplace);
+
+        //TODO SR: Teste, ob die Zeile ohne explizites SAVE gehen würde, wenn die Funktion Transactional wäre: Ja, geht.
+        //workplaceRepository.findById(workplaceId).orElseThrow().setEmployee(employee);
+    }
+
     public void deleteWorkplace(Long workplaceId) {
         if (workplaceRepository.findById(workplaceId).isPresent()) {
             workplaceRepository.deleteById(workplaceId);
@@ -134,7 +145,7 @@ public class WorkplaceService {
         }
     }
 
-    private void setPrevEmployeeWorkplaceToNullIfNecessary(Employee employee) {
+    public void removeEmployeeFromAnyWorkplace(Employee employee) {
 
         workplaceRepository.findByEmployee(employee).ifPresent(workplace -> {
             workplace.setEmployee(null);

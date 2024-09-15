@@ -10,11 +10,7 @@ import java.util.List;
 @Entity
 @Data
 @NoArgsConstructor
-public class Employee {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Employee extends BaseEntity {
 
     private String name;
 

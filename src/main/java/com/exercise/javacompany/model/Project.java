@@ -10,11 +10,7 @@ import java.util.List;
 @Entity
 @Data
 @NoArgsConstructor //Wird für JPA benötigt
-public class Project {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Project extends BaseEntity {
 
     private String name;
     private String description;
@@ -33,20 +29,6 @@ public class Project {
         this.priority = priority;
         this.responsibleEmployee = responsibleEmployee;
     }
-
-    /*
-    var name: String,
-    var description: String,
-    var priority: Int, //1 = highest priority, 2,3 ...
-    @ManyToOne //Hauptverantworlicher
-    var responsibleEmployee: Employee
-) {
-        //Beziehung "bearbeitet"
-        @ManyToMany
-        var assignedEmployees: MutableList<Employee> = mutableListOf()
-*/
-
-
 }
 
 

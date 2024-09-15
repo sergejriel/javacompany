@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 public class EmployeeCreateDTO {
     private String name;
     private EmployeeStatus status;
+    private Long workplaceId; //TODO SR: kann null sein
 
     public EmployeeCreateDTO(@NotNull Employee model){
         this.name = model.getName();

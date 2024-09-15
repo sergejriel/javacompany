@@ -8,11 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 @Entity
 @Data
 @NoArgsConstructor
-public class Ranking {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Ranking extends BaseEntity {
 
     @ManyToOne
     private Employee rankingEmployee;

@@ -4,30 +4,42 @@ import com.exercise.javacompany.DTO.EmployeeDTOs.EmployeeDTO;
 import com.exercise.javacompany.DTO.ProjectDTOs.*;
 import com.exercise.javacompany.model.Employee;
 import com.exercise.javacompany.model.Project;
+import com.exercise.javacompany.model.log.ProjectResponsibleEmployeeChangeLog;
 import com.exercise.javacompany.repository.EmployeeRepository;
 import com.exercise.javacompany.repository.ProjectRepository;
+import com.exercise.javacompany.repository.log.ProjectResponsibleEmployeeChangeLogRepository;
+import com.exercise.javacompany.service.deep.DeepServiceGate;
 import com.exercise.javacompany.utils.ValidationUtils;
 import jakarta.transaction.Transactional;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
     private final EmployeeRepository employeeRepository;
+    private final ProjectResponsibleEmployeeChangeLogRepository projectResponsibleEmployeeChangeLogRepository;
+    private final DeepServiceGate deepServiceGate;
 
     @Autowired
     public ProjectService(
             ProjectRepository projectRepository,
-            EmployeeRepository employeeRepository
+            EmployeeRepository employeeRepository,
+            ProjectResponsibleEmployeeChangeLogRepository projectResponsibleEmployeeChangeLogRepository,
+            DeepServiceGate deepServiceGate
     ) {
         this.projectRepository = projectRepository;
         this.employeeRepository = employeeRepository;
+        this.projectResponsibleEmployeeChangeLogRepository = projectResponsibleEmployeeChangeLogRepository;
+        this.deepServiceGate = deepServiceGate;
     }
 
     public ProjectDTO getProject(Long projectId) {
@@ -136,10 +148,61 @@ public class ProjectService {
         }
     }
 
+    //TODO SR: Hier werden weniger Daten durch die API gesendet. Teste es und ersetzte damit die erste Variante.
+    public void swapProjectPriorityV2(int oldPosition, int newPosition) {
+        List<Project> projects = new java.util.ArrayList<>(projectRepository.findAll().stream()
+                .sorted(Comparator.comparingInt(Project::getPriority))
+                .toList());
+
+        if (oldPosition < 0 || oldPosition >= projects.size() || newPosition < 0 || newPosition >= projects.size()) {
+            throw new IllegalArgumentException("Position(s) are out of bounds.");
+        }
+
+        Project projectToMove = projects.get(oldPosition);
+
+        projects.remove(oldPosition);
+
+        projects.add(newPosition, projectToMove);
+
+        for (int i = 0; i < projects.size(); i++) {
+            projects.get(i).setPriority(i+1);
+        }
+
+        projectRepository.saveAll(projects);
+    }
+
     public void deleteProject(Long projectId) {
         projectRepository.deleteById(projectId);
     }
 
-    //TODO SR: createResponsibleEmployeeChangeLog(), getAllResponsibleEmployeeChangeLog(), getResponsibleEmployeeChangeLogBetween()
+    public void createResponsibleEmployeeChangeLog(Long responsibleEmployeeId, Project responsibleProject) {
+        Employee responsibleEmployee = employeeRepository.findById(responsibleEmployeeId).orElseThrow();
 
+        ProjectResponsibleEmployeeChangeLog log = projectResponsibleEmployeeChangeLogRepository.save(
+                new ProjectResponsibleEmployeeChangeLog(
+                        responsibleEmployee,
+                        responsibleProject
+                )
+        );
+
+        deepServiceGate.handle(log);
+    }
+
+    public List<ProjectResponsibleEmployeeChangeLogDTO> getResponsibleEmployeeChangeLogBetween(
+            Long projectId,
+            LocalDateTime startTime,
+            LocalDateTime endTime
+    ) {
+        List<ProjectResponsibleEmployeeChangeLog> allChangeLogs = projectResponsibleEmployeeChangeLogRepository.findAllByResponsibleProjectIdAndOccurredBetween(
+                projectId,
+                startTime,
+                endTime.toLocalDate().atTime(23,59,59)
+        );
+        return allChangeLogs.stream().map(ProjectResponsibleEmployeeChangeLogDTO::new).toList();
+    }
+
+    public List<ProjectResponsibleEmployeeChangeLogDTO> getAllResponsibleEmployeeChangeLog() {
+        List<ProjectResponsibleEmployeeChangeLog> allChangeLogs = projectResponsibleEmployeeChangeLogRepository.findAll();
+        return allChangeLogs.stream().map(ProjectResponsibleEmployeeChangeLogDTO::new).toList();
+    }
 }
